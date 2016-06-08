@@ -22,7 +22,8 @@ local opt = {
 	border_size = 1.0,
 	border_colour = '000000',
 	alpha = '11',
-	streamer_font_colour = 'FF0000'
+	streamer_font_colour = '0000FF',
+	streamer_border_colour = '111111',
 }
 options.read_options(opt)
 
@@ -177,13 +178,17 @@ function txt_username(s)
 	end
 	if s:lower() == chat.streamer:lower() then
 		s = string.format(
-			'{\\1c&H%s&}%s{\\1c&H%s&}',
+			'{\\1c&H%s&}{\\3c&H%s&}%s:{\\1c&H%s&}{\\3c&H%s&}',
 			opt.streamer_font_colour,
+			opt.streamer_border_colour,
 			s,
-			opt.font_colour
+			opt.font_colour,
+			opt.border_colour
 		)
+	else
+		s = s .. ':'
 	end
-	return string.format('{\\b1}%s:{\\b0} ', s)
+	return string.format('{\\b1}%s{\\b0}', s)
 end
 
 function ev_tick()
@@ -216,7 +221,7 @@ function ev_redraw()
 		end
 		local msg = chat.display[idx]
 			message = message .. string.format(
-			'%s%s\\N',
+			'%s %s\\N',
 			txt_username(msg.user),
 			msg.text
 		)
