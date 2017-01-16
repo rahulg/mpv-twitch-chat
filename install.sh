@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+set -u
 
 DESTDIR=${XDG_CONFIG_HOME:-${HOME}/.config}/mpv/scripts
 
@@ -7,9 +7,9 @@ rocks=(luasocket luasec lunajson)
 src=(twitch-chat.lua)
 
 for rock in ${rocks[@]}; do
-	luarocks-5.2 --local show ${rock} 2>&1 >/dev/null
+	luarocks --local show ${rock} >/dev/null 2>/dev/null
 	if [[ $? != 0 ]]; then
-		luarocks-5.2 --local install ${rock}
+		luarocks --local install ${rock}
 	fi
 done
 
