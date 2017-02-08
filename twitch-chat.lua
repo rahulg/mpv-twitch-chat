@@ -100,11 +100,10 @@ end
 local TwitchChat = {}
 TwitchChat.__index = TwitchChat
 
-function TwitchChat.new(streamer, video_id)
+function TwitchChat.new(video_id)
 	local self = setmetatable({}, TwitchChat)
 
 	self.video_id = video_id
-	self.streamer = streamer
 	self.messages = Deque.new()
 	self.display = Deque.new()
 
@@ -135,6 +134,7 @@ function TwitchChat:fetch_block(ts_absolute)
 			message.ts = (msg.attributes.timestamp / 1000) - self.ts_start
 			message.user = msg.attributes.tags['display-name']
 			message.text = msg.attributes.message
+			message.is_streamer = msg.attributes.from:lower() == msg.attributes.room:lower()
 			self.messages:rpush(message)
 		end
 	else
@@ -172,21 +172,22 @@ function has_vo()
 	return vo_conf == "yes" and (video and video ~= "no" and video ~= "")
 end
 
-function txt_username(s)
-	if s == nil then
+function txt_username(msg)
+	local s = ''
+	if msg.user == nil then
 		return ''
 	end
-	if s:lower() == chat.streamer:lower() then
+	if msg.is_streamer then
 		s = string.format(
 			'{\\1c&H%s&}{\\3c&H%s&}%s:{\\1c&H%s&}{\\3c&H%s&}',
 			opt.streamer_font_colour,
 			opt.streamer_border_colour,
-			s,
+			msg.user,
 			opt.font_colour,
 			opt.border_colour
 		)
 	else
-		s = s .. ':'
+		s = msg.user .. ':'
 	end
 	return string.format('{\\b1}%s{\\b0}', s)
 end
@@ -222,7 +223,7 @@ function ev_redraw()
 		local msg = chat.display[idx]
 			message = message .. string.format(
 			'%s %s\\N',
-			txt_username(msg.user),
+			txt_username(msg),
 			msg.text
 		)
 	end
@@ -272,10 +273,10 @@ function ev_start_file()
 	if path == nil then
 		return
 	end
-	local pat_twitch_vod = 'twitch.tv/(.-)/v/(%d+)'
-	local streamer, video_id = string.match(path, pat_twitch_vod)
+	local pat_twitch_vod = 'twitch.tv/videos/(%d+)'
+	local video_id = string.match(path, pat_twitch_vod)
 	if video_id ~= nil then
-		chat = TwitchChat.new(streamer, video_id)
+		chat = TwitchChat.new(video_id)
 		tm_tick:resume()
 		tm_redraw:resume()
 		tm_redraw_enabled = true
