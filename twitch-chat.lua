@@ -22,6 +22,8 @@ local opt = {
 	border_size = 1.0,
 	border_colour = '000000',
 	alpha = '11',
+	mod_font_colour = '00FF00',
+	mod_border_colour = '111111',
 	streamer_font_colour = '0000FF',
 	streamer_border_colour = '111111',
 }
@@ -135,6 +137,7 @@ function TwitchChat:fetch_block(ts_absolute)
 			message.user = msg.attributes.tags['display-name']
 			message.text = msg.attributes.message
 			message.is_streamer = msg.attributes.from:lower() == msg.attributes.room:lower()
+			message.is_mod = msg.attributes.tags.mod
 			self.messages:rpush(message)
 		end
 	else
@@ -182,6 +185,15 @@ function txt_username(msg)
 			'{\\1c&H%s&}{\\3c&H%s&}%s:{\\1c&H%s&}{\\3c&H%s&}',
 			opt.streamer_font_colour,
 			opt.streamer_border_colour,
+			msg.user,
+			opt.font_colour,
+			opt.border_colour
+		)
+	elseif msg.is_mod then
+		s = string.format(
+			'{\\1c&H%s&}{\\3c&H%s&}%s:{\\1c&H%s&}{\\3c&H%s&}',
+			opt.mod_font_colour,
+			opt.mod_border_colour,
 			msg.user,
 			opt.font_colour,
 			opt.border_colour
