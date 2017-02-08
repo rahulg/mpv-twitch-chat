@@ -16,8 +16,8 @@ local opt = {
 	redraw_interval = 0.5,
 
 	-- text styling
-	font = 'Source Sans Pro',
-	font_size = 10,
+	font = 'Helvetica',
+	font_size = 8,
 	font_colour = 'FFFFFF',
 	border_size = 1.0,
 	border_colour = '000000',
