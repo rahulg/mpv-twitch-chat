@@ -127,7 +127,7 @@ function TwitchChat.new(video_id)
 end
 
 function TwitchChat:fetch_block(ts_absolute)
-	local url = string.format('https://rechat.twitch.tv/rechat-messages?start=%s&video_id=v%s', ts_absolute, self.video_id)
+	local url = string.format('https://rechat.twitch.tv/rechat-messages?start=%s&video_id=v%s', math.floor(ts_absolute), self.video_id)
 	local resp_body, code, headers, status = https.request(url)
 	if code == 200 then
 		local resp = json.decode(resp_body)
